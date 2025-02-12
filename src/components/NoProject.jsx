@@ -1,6 +1,7 @@
 import work from "../assets/work.svg";
+import Button from "../components/Button";
 
-export default function NoProject() {
+export default function NoProject({ onProjectSelect }) {
   return (
     <div className="flex h-full flex-col items-center justify-center gap-6">
       <img src={work} alt="" className="w-[30rem]" />
@@ -12,9 +13,7 @@ export default function NoProject() {
           Click on the button below to create your first project
         </p>
       </div>
-      <button className="cursor-pointer rounded-[6px] bg-stone-700 px-6 py-4">
-        Add Project
-      </button>
+      <Button onClick={onProjectSelect}>Add Project</Button>
     </div>
   );
 }
