@@ -1,6 +1,7 @@
 import "./App.css";
 import CreateProject from "./components/CreateProject";
 import NoProject from "./components/NoProject";
+import SelectedProject from "./components/SelectedProject";
 import Sidebar from "./components/Sidebar";
 import { useState } from "react";
 
@@ -8,13 +9,57 @@ function App() {
   const [projectState, setProjectState] = useState({
     selectProjectID: undefined,
     projects: [],
+    tasks: [],
   });
+
+  function handleAddTask(text) {
+    setProjectState((item) => {
+      const taskID = Math.random();
+      const newTask = {
+        projectID: item.selectProjectID,
+        text: text,
+        id: taskID,
+      };
+
+      return {
+        ...item,
+        tasks: [...item.tasks, newTask],
+      };
+    });
+  }
+
+  function handleDeleteTask(id) {
+    setProjectState((item) => {
+      return {
+        ...item,
+        tasks: item.tasks.filter((task) => task.id !== id),
+      };
+    });
+  }
 
   function handleProjectSelect() {
     setProjectState((item) => {
       return {
         ...item,
         selectProjectID: null,
+      };
+    });
+  }
+
+  function handleSelectProject(id) {
+    setProjectState((item) => {
+      return {
+        ...item,
+        selectProjectID: id,
+      };
+    });
+  }
+
+  function handleCancel() {
+    setProjectState((item) => {
+      return {
+        ...item,
+        selectProjectID: undefined,
       };
     });
   }
@@ -34,12 +79,41 @@ function App() {
     });
   }
 
+  function handleDelete() {
+    setProjectState((item) => {
+      return {
+        ...item,
+        selectProjectID: undefined,
+        projects: item.projects.filter(
+          (project) => project.id !== item.selectProjectID,
+        ),
+      };
+    });
+  }
+
   console.log(projectState);
 
-  let content;
+  const selectedProject = projectState.projects.find(
+    (project) => project.id === projectState.selectProjectID,
+  );
+
+  let content = (
+    <SelectedProject
+      project={selectedProject}
+      onDelete={handleDelete}
+      onAddTask={handleAddTask}
+      onDeleteTask={handleDeleteTask}
+      tasks={projectState.tasks}
+    />
+  );
 
   if (projectState.selectProjectID === null) {
-    content = <CreateProject handleAddProject={handleAddProject} />;
+    content = (
+      <CreateProject
+        handleAddProject={handleAddProject}
+        onCancel={handleCancel}
+      />
+    );
     // console.log("null, can create");
   } else if (projectState.selectProjectID === undefined) {
     content = <NoProject onProjectSelect={handleProjectSelect} />;
@@ -60,6 +134,8 @@ function App() {
             <Sidebar
               onProjectSelect={handleProjectSelect}
               projects={projectState.projects}
+              onSelectProject={handleSelectProject}
+              selectProjectID={projectState.selectProjectID}
             />
           </div>
           <div className="flex flex-col p-8">{content}</div>
